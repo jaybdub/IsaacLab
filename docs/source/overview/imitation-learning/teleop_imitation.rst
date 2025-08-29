@@ -508,6 +508,117 @@ Visualize the results of the trained policy by running the following command, us
    The trained policy performing the pick and place task in Isaac Lab.
 
 
+Demo 1.1: Data Generation and Policy Training for G1 Locomanipulation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. figure:: https://download.isaacsim.omniverse.nvidia.com/isaaclab/images/locomanipulation-g-1_steering_wheel_pick_place
+   :width: 100%
+   :align: center
+   :alt: G1 humanoid robot with locomanipulation performing a pick and place task
+   :figclass: align-center
+
+
+The same data generation and policy training steps from Demo 1.0 can be applied to the G1 humanoid robot with locomanipulation capabilities.
+This demonstration shows how to train a G1 robot to perform pick and place tasks with full-body locomotion and manipulation.
+
+The process follows the same workflow as Demo 1.0, but uses the ``Isaac-PickPlace-Locomanipulation-G1-Abs-v0`` task environment.
+
+Generate the dataset
+^^^^^^^^^^^^^^^^^^^^
+
+Follow the same data collection, annotation, and generation process as demonstrated in Demo 1.0, but adapted for the G1 locomanipulation task.
+
+.. hint::
+
+   If desired, data collection, annotation, and generation can be done using the same commands as the prior examples.
+
+   The G1 robot with locomanipulation capabilities combines full-body locomotion with manipulation to perform pick and place tasks.
+   This allows the robot to navigate and position itself optimally while performing manipulation tasks.
+
+   **Note that the following commands are only for your reference and are not required for this demo.**
+
+   To collect demonstrations:
+
+   .. code:: bash
+
+      ./isaaclab.sh -p scripts/tools/record_demos.py \
+      --device cpu \
+      --task Isaac-PickPlace-Locomanipulation-G1-Abs-v0 \
+      --teleop_device handtracking \
+      --dataset_file ./datasets/dataset_g1_locomanip.hdf5 \
+      --num_demos 5 --enable_pinocchio
+
+   You can replay the collected demonstrations by running:
+
+   .. code:: bash
+
+      ./isaaclab.sh -p scripts/tools/replay_demos.py \
+      --device cpu \
+      --task Isaac-PickPlace-Locomanipulation-G1-Abs-v0 \
+      --dataset_file ./datasets/dataset_g1_locomanip.hdf5 --enable_pinocchio
+
+   To annotate the demonstrations:
+
+   .. code:: bash
+
+      ./isaaclab.sh -p scripts/imitation_learning/isaaclab_mimic/annotate_demos.py \
+      --device cpu \
+      --task Isaac-PickPlace-Locomanipulation-G1-Abs-Mimic-v0 \
+      --input_file ./datasets/dataset_g1_locomanip.hdf5 \
+      --output_file ./datasets/dataset_annotated_g1_locomanip.hdf5 --enable_pinocchio
+
+   To generate the dataset:
+
+   .. code:: bash
+
+      ./isaaclab.sh -p scripts/imitation_learning/isaaclab_mimic/generate_dataset.py \
+      --device cpu --headless --num_envs 20 --generation_num_trials 1000 --enable_pinocchio \
+      --input_file ./datasets/dataset_annotated_g1_locomanip.hdf5 --output_file ./datasets/generated_dataset_g1_locomanip.hdf5
+
+Train a policy
+^^^^^^^^^^^^^^
+
+Train a policy using the generated dataset:
+
+.. code:: bash
+
+   ./isaaclab.sh -p scripts/imitation_learning/robomimic/train.py \
+   --task Isaac-PickPlace-Locomanipulation-G1-Abs-v0 --algo bc \
+   --normalize_training_actions \
+   --dataset ./datasets/generated_dataset_g1_locomanip.hdf5
+
+Visualize the results
+^^^^^^^^^^^^^^^^^^^^^
+
+Visualize the trained policy performance:
+
+.. code:: bash
+
+   ./isaaclab.sh -p scripts/imitation_learning/robomimic/play.py \
+   --device cpu \
+   --enable_pinocchio \
+   --task Isaac-PickPlace-Locomanipulation-G1-Abs-v0 \
+   --num_rollouts 50 \
+   --horizon 400 \
+   --norm_factor_min <NORM_FACTOR_MIN> \
+   --norm_factor_max <NORM_FACTOR_MAX> \
+   --checkpoint /PATH/TO/desired_model_checkpoint.pth
+
+.. note::
+   Change the ``NORM_FACTOR`` in the above command with the values generated in the training step.
+
+.. figure:: https://download.isaacsim.omniverse.nvidia.com/isaaclab/images/locomanipulation-g-1_steering_wheel_pick_place.gif
+   :width: 100%
+   :align: center
+   :alt: G1 humanoid robot performing a pick and place task
+   :figclass: align-center
+
+   The trained policy performing the pick and place task in Isaac Lab with Locomanipulation capabilities.
+
+Extending the Locomanipulation environment with other controllers
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
 Demo 2: Visuomotor Policy for a Humanoid Robot
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
