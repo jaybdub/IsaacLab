@@ -73,7 +73,6 @@ class PathHelper:
     def get_segment_by_distance(self, distance):
 
         for i in range(0, len(self.points) - 1):
-            d_a = self._point_distances[i]
             d_b = self._point_distances[i + 1]
 
             if distance < d_b:

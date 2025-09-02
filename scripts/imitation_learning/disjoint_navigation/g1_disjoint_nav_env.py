@@ -10,7 +10,6 @@
 
 import numpy as np
 import torch
-from dataclasses import asdict
 from pathlib import Path
 
 from common import (
@@ -34,19 +33,15 @@ from isaaclab.envs import ManagerBasedRLEnvCfg
 from isaaclab.envs.manager_based_rl_mimic_env import ManagerBasedRLMimicEnv
 from isaaclab.envs.mdp.recorders.recorders_cfg import ActionStateRecorderManagerCfg as ActionStateRecorderManagerCfg
 from isaaclab.managers import EventTermCfg as EventTerm
-from isaaclab.managers import ObservationGroupCfg as ObsGroup
-from isaaclab.managers import ObservationTermCfg as ObsTerm
-from isaaclab.managers import SceneEntityCfg
 from isaaclab.managers import TerminationTermCfg as DoneTerm
 from isaaclab.managers.recorder_manager import RecorderTerm, RecorderTermCfg
 from isaaclab.scene import InteractiveSceneCfg
 from isaaclab.sim.spawners.from_files.from_files_cfg import GroundPlaneCfg, UsdFileCfg
 from isaaclab.utils import configclass
-from isaaclab.utils.assets import ISAAC_NUCLEUS_DIR, ISAACLAB_NUCLEUS_DIR, retrieve_file_path
+from isaaclab.utils.assets import ISAAC_NUCLEUS_DIR, retrieve_file_path
 from isaaclab.utils.datasets import HDF5DatasetFileHandler
 
 from isaaclab_tasks.manager_based.locomanipulation.pick_place.locomanipulation_g1_env_cfg import ObservationsCfg
-from isaaclab_tasks.manager_based.manipulation.pick_place import mdp as manip_mdp
 
 NUM_FORKLIFTS = 6
 NUM_BOXES = 12
@@ -236,7 +231,7 @@ class ObjectTableSceneCfg(InteractiveSceneCfg):
         prim_path="{ENV_REGEX_NS}/Object",
         init_state=RigidObjectCfg.InitialStateCfg(pos=[-0.35, 0.45, 0.9996 - 0.3], rot=[1, 0, 0, 0]),
         spawn=UsdFileCfg(
-            usd_path=f"omniverse://isaac-dev.ov.nvidia.com/Isaac/IsaacLab/Mimic/pick_place_task/pick_place_assets/steering_wheel.usd",
+            usd_path="omniverse://isaac-dev.ov.nvidia.com/Isaac/IsaacLab/Mimic/pick_place_task/pick_place_assets/steering_wheel.usd",
             scale=(0.75, 0.75, 0.75),
             rigid_props=sim_utils.RigidBodyPropertiesCfg(),
         ),
@@ -495,7 +490,6 @@ class G1DisjointNavRecording(DisjointNavRecording):
         if dataset_state is None:
             return None
 
-        base_pose = dataset_state["articulation"]["robot"]["root_pose"]
         object_pose = dataset_state["rigid_object"]["object"]["root_pose"]
 
         target = DisjointNavRecordingItem(

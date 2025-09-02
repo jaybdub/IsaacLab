@@ -490,13 +490,7 @@ free_thresh: {free_thresh}
         x_px = int(pixel[0, 0])
         y_px = int(pixel[0, 1])
 
-        if x_px < 0:
-            return False
-        elif x_px >= self.width_pixels():
-            return False
-        elif y_px < 0:
-            return False
-        elif y_px >= self.height_pixels():
+        if (x_px < 0) or (x_px >= self.width_pixels()) or (y_px < 0) or (y_px >= self.height_pixels()):
             return False
 
         return True

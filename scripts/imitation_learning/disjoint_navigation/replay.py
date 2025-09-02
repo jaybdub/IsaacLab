@@ -15,7 +15,7 @@
 
 import argparse
 
-import pinocchio
+import pinocchio  # noqa: F401
 
 from isaaclab.app import AppLauncher
 
@@ -104,8 +104,6 @@ args_cli = parser.parse_args()
 app_launcher = AppLauncher(args_cli)
 simulation_app = app_launcher.app
 
-import numpy as np
-import random
 import torch
 
 import omni.kit
