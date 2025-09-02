@@ -8,10 +8,10 @@ trajectories from static manipulation recordings.
 
 The overall workflow is as follows
 
-1. Record a static manipulation trajectory of "picking up" and "dropping off" an object.
-   In this phase, the robot base is stationary.  This is done by human teleoperation.
+1. Record an in-place manipulation trajectory of "picking up" and "dropping off" an object.
+   In this phase, the robot base stays in-place and only the upper body moves.  This is done by human teleoperation.
 
-2. Augment the static manipulation trajectory using mimic data generation pipeline.  This will
+2. Augment the in-place manipulation trajectory using mimic data generation pipeline.  This will
    Create a diverse set of augmented static manipulation trajectories.
 
 3. Run the "disjoint navigation" locomanipulation data generation pipeline to create
