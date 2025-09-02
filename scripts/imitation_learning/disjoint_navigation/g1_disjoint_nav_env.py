@@ -10,9 +10,18 @@
 
 import numpy as np
 import torch
+from dataclasses import asdict
 from pathlib import Path
 
-from common import DisjointNavRecording, DisjointNavRecordingItem, DisjointNavScenario, HasPose, SceneBody, SceneFixture
+from common import (
+    DisjointNavRecording,
+    DisjointNavRecordingItem,
+    DisjointNavReplayState,
+    DisjointNavScenario,
+    HasPose,
+    SceneBody,
+    SceneFixture,
+)
 from mdp.actions import G1_UPPER_BODY_IK_ACTION_CFG, LowerBodyActionCfg
 from occupancy_map import OccupancyMap
 
@@ -36,10 +45,8 @@ from isaaclab.utils import configclass
 from isaaclab.utils.assets import ISAAC_NUCLEUS_DIR, ISAACLAB_NUCLEUS_DIR, retrieve_file_path
 from isaaclab.utils.datasets import HDF5DatasetFileHandler
 
-from isaaclab_tasks.manager_based.manipulation.pick_place import mdp as manip_mdp
 from isaaclab_tasks.manager_based.locomanipulation.pick_place.locomanipulation_g1_env_cfg import ObservationsCfg
-from dataclasses import asdict
-from common import DisjointNavReplayState
+from isaaclab_tasks.manager_based.manipulation.pick_place import mdp as manip_mdp
 
 NUM_FORKLIFTS = 6
 NUM_BOXES = 12
@@ -253,8 +260,8 @@ class ObjectTableSceneCfg(InteractiveSceneCfg):
 # Add forklifts
 for i in range(NUM_FORKLIFTS):
     setattr(
-        ObjectTableSceneCfg, 
-        f"forklift_{i}", 
+        ObjectTableSceneCfg,
+        f"forklift_{i}",
         AssetBaseCfg(
             prim_path=f"/World/envs/env_.*/Forklift{i}",
             init_state=AssetBaseCfg.InitialStateCfg(pos=[0.0, 0.0, 0.0], rot=[1.0, 0.0, 0.0, 0.0]),
@@ -262,23 +269,22 @@ for i in range(NUM_FORKLIFTS):
                 usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Forklift/forklift.usd",
                 rigid_props=sim_utils.RigidBodyPropertiesCfg(kinematic_enabled=True),
             ),
-        )        
+        ),
     )
 
 # Add boxes
 for i in range(NUM_BOXES):
     setattr(
-        ObjectTableSceneCfg, 
-        f"box_{i}", 
+        ObjectTableSceneCfg,
+        f"box_{i}",
         AssetBaseCfg(
             prim_path=f"/World/envs/env_.*/Box{i}",
             init_state=AssetBaseCfg.InitialStateCfg(pos=[0.0, 0.0, 0.0], rot=[1.0, 0.0, 0.0, 0.0]),
-                
             spawn=UsdFileCfg(
                 usd_path=f"{ISAAC_NUCLEUS_DIR}/Environments/Simple_Warehouse/Props/SM_CardBoxB_01_681.usd",
                 rigid_props=sim_utils.RigidBodyPropertiesCfg(kinematic_enabled=True),
             ),
-        )        
+        ),
     )
 
 
@@ -360,9 +366,9 @@ class DisjointNavReplayStateRecorder(RecorderTerm):
             "base_goal_approach_pose": replay_state.base_goal_approach_pose,
             "base_path": replay_state.base_path[None, :],
             "recording_step": torch.tensor([[replay_state.recording_step]]),
-            "obstacle_fixture_poses": replay_state.obstacle_fixture_poses
+            "obstacle_fixture_poses": replay_state.obstacle_fixture_poses,
         }
-        
+
         return "replay_state", replay_state_dict
 
 
@@ -599,7 +605,7 @@ class G1DisjointNavScenario(DisjointNavScenario):
 
     def get_env(self):
         return self._env
-    
+
     def step(self):
         self._env.step(self._env_action)
 

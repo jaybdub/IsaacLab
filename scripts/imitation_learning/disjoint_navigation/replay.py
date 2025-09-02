@@ -111,6 +111,8 @@ import torch
 import omni.kit
 from common import (
     DisjointNavRecording,
+    DisjointNavReplayState,
+    DisjointNavReplayTask,
     DisjointNavScenario,
     RelativePose,
     place_randomly,
@@ -118,14 +120,15 @@ from common import (
     transform_inv,
     transform_mul,
     transform_relative_pose,
-    DisjointNavReplayState,
-    DisjointNavReplayTask
 )
-from scripts.imitation_learning.disjoint_navigation.g1_disjoint_nav_env import G1DisjointNavRecording, G1DisjointNavScenario
 from occupancy_map import OccupancyMap, merge_occupancy_maps
 from path_utils import PathHelper
 from visualization import occupancy_map_add_to_stage
 
+from scripts.imitation_learning.disjoint_navigation.g1_disjoint_nav_env import (
+    G1DisjointNavRecording,
+    G1DisjointNavScenario,
+)
 
 
 def replay(
@@ -330,7 +333,7 @@ def replay(
             )[0]
             state.left_hand_joint_positions_target = recording_item.left_hand_joint_positions_target
             state.right_hand_joint_positions_target = recording_item.right_hand_joint_positions_target
-            
+
             # Update state
 
             goal_xy = base_goal.get_pose_2d()[0, :2]

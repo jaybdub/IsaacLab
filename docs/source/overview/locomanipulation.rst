@@ -4,7 +4,7 @@ Locomanipulation Data Generation
 ================================
 
 This tutorial demonstrates how you can generate diverse locomanipulation
-trajectories from static manipulation recordings.  
+trajectories from static manipulation recordings.
 
 The overall workflow is as follows
 
@@ -15,7 +15,7 @@ The overall workflow is as follows
    Create a diverse set of augmented static manipulation trajectories.
 
 3. Run the "disjoint navigation" locomanipulation data generation pipeline to create
-   end-to-end locomanipulation trajectories by combining the static manipulation sequences with 
+   end-to-end locomanipulation trajectories by combining the static manipulation sequences with
    path planning.
 
 Step 1 - Static manipulation teleoperation

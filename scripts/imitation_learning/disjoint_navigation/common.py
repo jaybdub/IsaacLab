@@ -8,10 +8,10 @@
 """Launch Isaac Sim Simulator first."""
 
 
+import enum
 import numpy as np
 import random
 import torch
-import enum
 from dataclasses import dataclass
 
 from isaacsim.replicator.mobility_gen.impl.path_planner import compress_path, generate_paths
@@ -56,13 +56,13 @@ def transform_relative_pose(world_pose: torch.Tensor, src_frame_pose: torch.Tens
 class DisjointNavRecordingItem:
     """Data container for in-place manipulation recording state.  Used during locomanipulation replay."""
 
-    left_hand_pose_target: torch.Tensor # The pose of the left hand in world coordinates.
-    right_hand_pose_target: torch.Tensor # The pose of the right hand in world coordinates.
-    left_hand_joint_positions_target: torch.Tensor # The left hand joint positions.
-    right_hand_joint_positions_target: torch.Tensor # The right hand joint positions.
-    base_pose: torch.Tensor # The robot base pose in world coordinates.
-    object_pose: torch.Tensor # The target object pose in world coordinates.
-    fixture_pose: torch.Tensor # The fixture (ie: table) pose in world coordinates.
+    left_hand_pose_target: torch.Tensor  # The pose of the left hand in world coordinates.
+    right_hand_pose_target: torch.Tensor  # The pose of the right hand in world coordinates.
+    left_hand_joint_positions_target: torch.Tensor  # The left hand joint positions.
+    right_hand_joint_positions_target: torch.Tensor  # The right hand joint positions.
+    base_pose: torch.Tensor  # The robot base pose in world coordinates.
+    object_pose: torch.Tensor  # The target object pose in world coordinates.
+    fixture_pose: torch.Tensor  # The fixture (ie: table) pose in world coordinates.
 
 
 class DisjointNavRecording:
@@ -196,6 +196,7 @@ class RelativePose(HasPose):
 
 class SceneFixture(SceneAsset, HasOccupancyMap):
     """A helper class for working with assets in a scene that have an associated occupancy map."""
+
     pass
 
 
@@ -268,7 +269,7 @@ def place_randomly(
 class DisjointNavScenario:
     """An abstract base class that wraps the underlying environment, exposing methods needed for integration with
     locomanipulation replay.
-    
+
     This class defines the core methods needed to integrate an environment with the disjoint navigation pipeline for
     locomanipulation replay.  By implementing these methods for a new environment, the environment can be used with
     the disjoint navigation replay function.
@@ -343,30 +344,36 @@ class DisjointNavScenario:
 class DisjointNavReplayTask(enum.IntEnum):
     """The current state of the locomanipulation replay."""
 
-    GRASP_OBJECT = 0 # Initial state.
-    LIFT_OBJECT = 1 # The object is grasped and is being lifted.
-    NAVIGATE = 2 # The object is lifted and the robot is navigating.
-    APPROACH = 3 # The robot has finished navigating and is approaching the destination fixture.
-    DROP_OFF_OBJECT = 4 # The robot has reached it's final position and is dropping off the object.
-    DONE = 5 # Finished.
+    GRASP_OBJECT = 0  # Initial state.
+    LIFT_OBJECT = 1  # The object is grasped and is being lifted.
+    NAVIGATE = 2  # The object is lifted and the robot is navigating.
+    APPROACH = 3  # The robot has finished navigating and is approaching the destination fixture.
+    DROP_OFF_OBJECT = 4  # The robot has reached it's final position and is dropping off the object.
+    DONE = 5  # Finished.
 
 
 @dataclass
 class DisjointNavReplayState:
     """A container for data that is recorded during locomanipulation replay.  This is the final output of the pipeline"""
 
-    left_hand_pose_target: torch.Tensor | None = None # The left hand's target pose.
-    right_hand_pose_target: torch.Tensor | None = None # The right hand's target pose.
-    left_hand_joint_positions_target: torch.Tensor | None = None # The left hand's target joint positions
-    right_hand_joint_positions_target: torch.Tensor | None = None # The right hand's target joint positions
-    base_velocity_target: torch.Tensor | None = None # The target velocity of the robot base.  This value is provided to the underlying base controller or policy.
-    start_fixture_pose: torch.Tensor | None = None # The pose of the start fixture (ie: pick-up table).
-    end_fixture_pose: torch.Tensor | None = None # The pose of the end / destination fixture (ie: drop-off table)
-    object_pose: torch.Tensor | None = None # The pose of the target object.
-    base_pose: torch.Tensor | None = None # The pose of the robot base.
-    task: int | None = None # The state of the the disjoint navigation replay script's state machine.
-    base_goal_pose: torch.Tensor | None = None # The goal pose of the robot base (ie: the final destination before dropping off the object)
-    base_goal_approach_pose: torch.Tensor | None = None # The goal pose provided to the path planner (this may differ from the final pose, so the robot can "approach" the final point)
-    base_path: torch.Tensor | None = None # The robot base path as determined by the path planner.
-    recording_step: int | None = None # The current recording step used for upper body replay.
-    obstacle_fixture_poses: torch.Tensor | None = None # The pose of all obstacle fixtures in the scene.
+    left_hand_pose_target: torch.Tensor | None = None  # The left hand's target pose.
+    right_hand_pose_target: torch.Tensor | None = None  # The right hand's target pose.
+    left_hand_joint_positions_target: torch.Tensor | None = None  # The left hand's target joint positions
+    right_hand_joint_positions_target: torch.Tensor | None = None  # The right hand's target joint positions
+    base_velocity_target: torch.Tensor | None = (
+        None  # The target velocity of the robot base.  This value is provided to the underlying base controller or policy.
+    )
+    start_fixture_pose: torch.Tensor | None = None  # The pose of the start fixture (ie: pick-up table).
+    end_fixture_pose: torch.Tensor | None = None  # The pose of the end / destination fixture (ie: drop-off table)
+    object_pose: torch.Tensor | None = None  # The pose of the target object.
+    base_pose: torch.Tensor | None = None  # The pose of the robot base.
+    task: int | None = None  # The state of the the disjoint navigation replay script's state machine.
+    base_goal_pose: torch.Tensor | None = (
+        None  # The goal pose of the robot base (ie: the final destination before dropping off the object)
+    )
+    base_goal_approach_pose: torch.Tensor | None = (
+        None  # The goal pose provided to the path planner (this may differ from the final pose, so the robot can "approach" the final point)
+    )
+    base_path: torch.Tensor | None = None  # The robot base path as determined by the path planner.
+    recording_step: int | None = None  # The current recording step used for upper body replay.
+    obstacle_fixture_poses: torch.Tensor | None = None  # The pose of all obstacle fixtures in the scene.
