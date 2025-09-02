@@ -533,7 +533,7 @@ def _omap_world_to_px(points, origin, width_meters, height_meters, width_pixels,
 def merge_occupancy_maps(
     src_omaps: list[OccupancyMap], method: OccupancyMapMergeMethod = OccupancyMapMergeMethod.UNION
 ):
-
+    """Merge occupancy maps by computing the union or intersection of the occupied regions."""
     dst_resolution = min([o.resolution for o in src_omaps])
 
     min_x = min([o.bottom_left_pixel_world_coords()[0] for o in src_omaps])
@@ -598,10 +598,12 @@ def merge_occupancy_maps(
 
 
 def intersect_occupancy_maps(src_omaps: list[OccupancyMap]):
+    """Compute a new occupancy map by interescting the occupied regions of a list of occupancy maps."""
     return merge_occupancy_maps(src_omaps=src_omaps, method=OccupancyMapMergeMethod.INTERSECTION)
 
 
 def transform_points(points: np.ndarray, transform: np.ndarray):
+    """Transform a set of points by a 2D transform."""
     points = np.concatenate([points, np.ones_like(points[:, 0:1])], axis=-1).T
     points = transform @ points
     points = points.T
@@ -610,14 +612,17 @@ def transform_points(points: np.ndarray, transform: np.ndarray):
 
 
 def make_rotate_transform(angle):
+    """Create a 2D rotation transform."""
     return np.array([[np.cos(angle), -np.sin(angle), 0.0], [np.sin(angle), np.cos(angle), 0.0], [0.0, 0.0, 1.0]])
 
 
 def make_translate_transform(dx, dy):
+    """Create a 2D translation transform."""
     return np.array([[1.0, 0.0, dx], [0.0, 1.0, dy], [0.0, 0.0, 1.0]])
 
 
 def transform_occupancy_map(omap: OccupancyMap, transform: np.ndarray):
+    """Transform an occupancy map using a 2D transform."""
 
     src_box_world_coords = np.array([
         [omap.origin[0], omap.origin[1]],
