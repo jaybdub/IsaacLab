@@ -70,11 +70,11 @@ class AgileBasedLowerBodyAction(ActionTerm):
 
     def _compose_policy_input(self, base_command: torch.Tensor, obs_tensor: torch.Tensor) -> torch.Tensor:
         """Compose the policy input by concatenating repeated commands with observations.
-        
+
         Args:
             base_command: The base command tensor [vx, vy, wz, hip_height].
             obs_tensor: The observation tensor from the environment.
-            
+
         Returns:
             The composed policy input tensor with repeated commands concatenated to observations.
         """
@@ -83,11 +83,11 @@ class AgileBasedLowerBodyAction(ActionTerm):
         # Default to 1 if history_length is None (no history, just current observation)
         if history_length is None:
             history_length = 1
-        
+
         # Repeat commands based on history length and concatenate with observations
         repeated_commands = base_command.unsqueeze(1).repeat(1, history_length, 1).reshape(base_command.shape[0], -1)
         policy_input = torch.cat([repeated_commands, obs_tensor], dim=-1)
-        
+
         return policy_input
 
     def process_actions(self, actions: torch.Tensor):
