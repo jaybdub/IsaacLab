@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 
-from isaaclab_assets.robots.unitree import G1_LOCOMANIPULATION_ROBOT_CFG
+from isaaclab_assets.robots.unitree import G1_29DOF_CFG
 
 import isaaclab.envs.mdp as base_mdp
 import isaaclab.sim as sim_utils
@@ -68,7 +68,7 @@ class LocomanipulationG1SceneCfg(InteractiveSceneCfg):
     )
 
     # Humanoid robot w/ arms higher
-    robot: ArticulationCfg = G1_LOCOMANIPULATION_ROBOT_CFG
+    robot: ArticulationCfg = G1_29DOF_CFG
 
     # Ground plane
     ground = AssetBaseCfg(
@@ -201,7 +201,7 @@ class LocomanipulationG1EnvCfg(ManagerBasedRLEnvCfg):
 
         # Set the URDF and mesh paths for the IK controller
         urdf_omniverse_path = (
-            "omniverse://isaac-dev.ov.nvidia.com/Projects/agile/Robots/urdf/g1/g1_29dof_with_hand_exported.urdf"
+            f"{ISAACLAB_NUCLEUS_DIR}/Controllers/LocomanipulationAssets/unitree_g1_kinematics_asset/g1_29dof_with_hand_only_kinematics.urdf"
         )
 
         # Retrieve local paths for the URDF and mesh files. Will be cached for call after the first time.

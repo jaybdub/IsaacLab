@@ -12,7 +12,7 @@ from scipy.spatial.transform import Rotation as R
 import omni.log
 from dex_retargeting.retargeting_config import RetargetingConfig
 
-from isaaclab.utils.assets import retrieve_file_path
+from isaaclab.utils.assets import ISAACLAB_NUCLEUS_DIR, retrieve_file_path
 
 # The index to map the OpenXR hand joints to the hand joints used
 # in Dex-retargeting.
@@ -64,8 +64,8 @@ class G1DexRetargeting:
         hand_joint_names: list[str],
         right_hand_config_filename: str = "g1_hand_right_dexpilot.yml",
         left_hand_config_filename: str = "g1_hand_left_dexpilot.yml",
-        left_hand_urdf_path: str = "omniverse://isaac-dev.ov.nvidia.com/Projects/agile/Robots/G1_left_hand.urdf",
-        right_hand_urdf_path: str = "omniverse://isaac-dev.ov.nvidia.com/Projects/agile/Robots/G1_right_hand.urdf",
+        left_hand_urdf_path: str = f"{ISAACLAB_NUCLEUS_DIR}/Controllers/LocomanipulationAssets/unitree_g1_dexpilot_asset/G1_left_hand.urdf",
+        right_hand_urdf_path: str = f"{ISAACLAB_NUCLEUS_DIR}/Controllers/LocomanipulationAssets/unitree_g1_dexpilot_asset/G1_right_hand.urdf",
     ):
         """Initialize the hand retargeting.
 
