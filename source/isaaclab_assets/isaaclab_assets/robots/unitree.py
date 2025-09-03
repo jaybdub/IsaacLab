@@ -14,7 +14,7 @@ The following configurations are available:
 * :obj:`H1_MINIMAL_CFG`: H1 humanoid robot with minimal collision bodies
 * :obj:`G1_CFG`: G1 humanoid robot
 * :obj:`G1_MINIMAL_CFG`: G1 humanoid robot with minimal collision bodies
-* :obj:`G1_LOCOMANIPULATION_CFG`: G1 humanoid robot configured for locomanipulation tasks
+* :obj:`G1_29DOF_CFG`: G1 humanoid robot configured for locomanipulation tasks
 
 Reference: https://github.com/unitreerobotics/unitree_ros
 """
@@ -384,7 +384,7 @@ This configuration removes most collision meshes to speed up simulation.
 """
 
 
-G1_LOCOMANIPULATION_ROBOT_CFG = ArticulationCfg(
+G1_29DOF_CFG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
         usd_path="omniverse://isaac-dev.ov.nvidia.com/Projects/agile/Robots/Collected_g1/g1_collision_geom_simplified_bigger_offset_with_hand_collision.usd",
         activate_contact_sensors=False,
@@ -546,10 +546,10 @@ Key features:
 
 Usage examples:
     # For fixed base scenarios (upper body manipulation only)
-    fixed_base_cfg = G1_LOCOMANIPULATION_CFG.copy()
+    fixed_base_cfg = G1_29DOF_CFG.copy()
     fixed_base_cfg.spawn.articulation_props.fix_root_link = True
 
     # For mobile scenarios (locomotion + manipulation)
-    mobile_cfg = G1_LOCOMANIPULATION_CFG.copy()
+    mobile_cfg = G1_29DOF_CFG.copy()
     mobile_cfg.spawn.articulation_props.fix_root_link = False
 """
