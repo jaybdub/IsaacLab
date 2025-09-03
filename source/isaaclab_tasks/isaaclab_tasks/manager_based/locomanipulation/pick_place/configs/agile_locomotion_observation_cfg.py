@@ -12,7 +12,12 @@ from isaaclab.utils import configclass
 
 @configclass
 class AgileTeacherPolicyObservationsCfg(ObsGroup):
-    """Observation specifications for the MDP."""
+    """Observation specifications for the Agile lower body policy.
+    
+    Note: This configuration defines only part of the observation input to the Agile lower body policy.
+    The lower body command portion is appended to the observation tensor in the action term, as that
+    is where the environment has access to those commands.
+    """
 
     base_lin_vel = ObsTerm(
         func=mdp.base_lin_vel,

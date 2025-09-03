@@ -68,6 +68,28 @@ class AgileBasedLowerBodyAction(ActionTerm):
     def processed_actions(self) -> torch.Tensor:
         return self._processed_actions
 
+    def _compose_policy_input(self, base_command: torch.Tensor, obs_tensor: torch.Tensor) -> torch.Tensor:
+        """Compose the policy input by concatenating repeated commands with observations.
+        
+        Args:
+            base_command: The base command tensor [vx, vy, wz, hip_height].
+            obs_tensor: The observation tensor from the environment.
+            
+        Returns:
+            The composed policy input tensor with repeated commands concatenated to observations.
+        """
+        # Get history length from observation configuration
+        history_length = getattr(self._observation_cfg, self._obs_group_name).history_length
+        # Default to 1 if history_length is None (no history, just current observation)
+        if history_length is None:
+            history_length = 1
+        
+        # Repeat commands based on history length and concatenate with observations
+        repeated_commands = base_command.unsqueeze(1).repeat(1, history_length, 1).reshape(base_command.shape[0], -1)
+        policy_input = torch.cat([repeated_commands, obs_tensor], dim=-1)
+        
+        return policy_input
+
     def process_actions(self, actions: torch.Tensor):
         """Process the input actions using the locomotion policy.
 
@@ -81,13 +103,8 @@ class AgileBasedLowerBodyAction(ActionTerm):
 
         obs_tensor = self._env.obs_buf["lower_body_policy"]
 
-        # Concatenate actions repeated by history length
-        history_length = getattr(self._observation_cfg, self._obs_group_name).history_length
-        # Default to 1 if history_length is None (no history, just current observation)
-        if history_length is None:
-            history_length = 1
-        repeated_commands = base_command.unsqueeze(1).repeat(1, history_length, 1).reshape(base_command.shape[0], -1)
-        policy_input = torch.cat([repeated_commands, obs_tensor], dim=-1)
+        # Compose policy input using helper function
+        policy_input = self._compose_policy_input(base_command, obs_tensor)
 
         joint_actions = self._policy.forward(policy_input)
 
