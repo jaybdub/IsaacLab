@@ -21,10 +21,10 @@ from typing import TYPE_CHECKING
 from pink import solve_ik
 
 from isaaclab.assets import ArticulationCfg
-from isaaclab.controllers.pink_kinematics_configuration import PinkKinematicsConfiguration
 from isaaclab.utils.string import resolve_matching_names_values
 
 from .null_space_posture_task import NullSpacePostureTask
+from .pink_kinematics_configuration import PinkKinematicsConfiguration
 
 if TYPE_CHECKING:
     from .pink_ik_cfg import PinkIKControllerCfg
@@ -59,10 +59,10 @@ class PinkIKController:
             controlled_joint_indices: A list of joint indices in the USD asset controlled by the Pink IK controller.
 
         Raises:
-            KeyError: When Pink joint names cannot be matched to robot configuration joint positions.
+            ValueError: When joint_names or all_joint_names are not provided in the configuration.
         """
-        if cfg.controlled_joint_names is None:
-            raise ValueError("controlled_joint_names must be provided in the configuration")
+        if cfg.joint_names is None:
+            raise ValueError("joint_names must be provided in the configuration")
         if cfg.all_joint_names is None:
             raise ValueError("all_joint_names must be provided in the configuration")
 
@@ -77,7 +77,7 @@ class PinkIKController:
         self.pink_configuration = PinkKinematicsConfiguration(
             urdf_path=cfg.urdf_path,
             mesh_path=cfg.mesh_path,
-            controlled_joint_names=cfg.controlled_joint_names,
+            controlled_joint_names=cfg.joint_names,
         )
 
         # Find the initial joint positions by matching Pink's joint names to robot_cfg.init_state.joint_pos,
@@ -117,26 +117,26 @@ class PinkIKController:
             ValueError: If any consistency checks fail.
         """
         # Check: Length consistency
-        if cfg.controlled_joint_names is None:
-            raise ValueError("cfg.controlled_joint_names cannot be None")
-        if len(controlled_joint_indices) != len(cfg.controlled_joint_names):
+        if cfg.joint_names is None:
+            raise ValueError("cfg.joint_names cannot be None")
+        if len(controlled_joint_indices) != len(cfg.joint_names):
             raise ValueError(
                 f"Length mismatch: controlled_joint_indices has {len(controlled_joint_indices)} elements "
-                f"but cfg.controlled_joint_names has {len(cfg.controlled_joint_names)} elements"
+                f"but cfg.joint_names has {len(cfg.joint_names)} elements"
             )
 
         # Check: Joint name consistency - verify that the indices point to the expected joint names
         actual_joint_names = [cfg.all_joint_names[idx] for idx in controlled_joint_indices]
-        if actual_joint_names != cfg.controlled_joint_names:
+        if actual_joint_names != cfg.joint_names:
             mismatches = []
-            for i, (actual, expected) in enumerate(zip(actual_joint_names, cfg.controlled_joint_names)):
+            for i, (actual, expected) in enumerate(zip(actual_joint_names, cfg.joint_names)):
                 if actual != expected:
                     mismatches.append(
                         f"Index {i}: index {controlled_joint_indices[i]} points to '{actual}' but expected '{expected}'"
                     )
             if mismatches:
                 raise ValueError(
-                    "Joint name mismatch between controlled_joint_indices and cfg.controlled_joint_names:\n"
+                    "Joint name mismatch between controlled_joint_indices and cfg.joint_names:\n"
                     + "\n".join(mismatches)
                 )
 
@@ -159,7 +159,7 @@ class PinkIKController:
         )
         # Create reordering arrays for controlled joints only
         pink_controlled_joint_names = self.pink_configuration.controlled_joint_names_pinocchio_order
-        isaac_lab_controlled_joint_names = self.cfg.controlled_joint_names
+        isaac_lab_controlled_joint_names = self.cfg.joint_names
 
         if pink_controlled_joint_names is None:
             raise ValueError("pink_controlled_joint_names should not be None")

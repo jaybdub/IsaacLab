@@ -13,8 +13,8 @@ from pink.tasks import FrameTask
 
 import isaaclab.utils.math as math_utils
 from isaaclab.assets.articulation import Articulation
-from isaaclab.controllers.local_frame_task import LocalFrameTask
 from isaaclab.controllers.pink_ik import PinkIKController
+from isaaclab.controllers.pink_ik.local_frame_task import LocalFrameTask
 from isaaclab.managers.action_manager import ActionTerm
 
 if TYPE_CHECKING:
@@ -71,7 +71,7 @@ class PinkInverseKinematicsAction(ActionTerm):
         self._isaaclab_controlled_joint_ids, self._isaaclab_controlled_joint_names = self._asset.find_joints(
             self.cfg.pink_controlled_joint_names
         )
-        self.cfg.controller.controlled_joint_names = self._isaaclab_controlled_joint_names
+        self.cfg.controller.joint_names = self._isaaclab_controlled_joint_names
         self._isaaclab_all_joint_ids = list(range(len(self._asset.data.joint_names)))
         self.cfg.controller.all_joint_names = self._asset.data.joint_names
 
@@ -253,11 +253,6 @@ class PinkInverseKinematicsAction(ActionTerm):
 
             position = actions[:, pos_start:pos_end]
             quaternion = actions[:, quat_start:quat_end]
-
-            # Check quaternion norm (must be close to 1 for a well-defined unit quaternion)
-            quat_norm = torch.norm(quaternion, p=2, dim=-1)
-            if torch.any(torch.abs(quat_norm - 1.0) > 1e-4):
-                raise ValueError(f"Task {task_index}: Quaternion norm {quat_norm.max().item():.6f} is not close to 1.0")
 
             # Create pose matrix directly into pre-allocated tensor
             self._controlled_frame_poses[task_index] = math_utils.make_pose(

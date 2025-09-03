@@ -12,8 +12,8 @@ import pinocchio as pin
 import pytest
 from pink.exceptions import TargetNotSet
 
-from isaaclab.controllers.local_frame_task import LocalFrameTask
-from isaaclab.controllers.pink_kinematics_configuration import PinkKinematicsConfiguration
+from isaaclab.controllers.pink_ik.local_frame_task import LocalFrameTask
+from isaaclab.controllers.pink_ik.pink_kinematics_configuration import PinkKinematicsConfiguration
 
 
 class TestLocalFrameTask:

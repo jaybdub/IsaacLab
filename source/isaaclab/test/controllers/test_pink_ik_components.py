@@ -12,7 +12,7 @@ import pinocchio as pin
 import pytest
 from pink.exceptions import FrameNotFound
 
-from isaaclab.controllers.pink_kinematics_configuration import PinkKinematicsConfiguration
+from isaaclab.controllers.pink_ik.pink_kinematics_configuration import PinkKinematicsConfiguration
 
 
 class TestPinkKinematicsConfiguration:

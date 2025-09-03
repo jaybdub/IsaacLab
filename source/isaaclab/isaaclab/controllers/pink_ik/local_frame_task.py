@@ -9,7 +9,7 @@ from collections.abc import Sequence
 import pinocchio as pin
 from pink.tasks.frame_task import FrameTask
 
-from isaaclab.controllers.pink_kinematics_configuration import PinkKinematicsConfiguration
+from .pink_kinematics_configuration import PinkKinematicsConfiguration
 
 
 class LocalFrameTask(FrameTask):
@@ -30,8 +30,22 @@ class LocalFrameTask(FrameTask):
         """
         Initialize the LocalFrameTask with configuration.
 
+        This task computes pose errors in a local (custom) frame rather than the world frame,
+        allowing for more flexible control strategies where the reference frame can be
+        specified independently.
+
         Args:
-            base_link_frame_name: Name of the base link frame.
+            frame: Name of the frame to control (end-effector or target frame).
+            base_link_frame_name: Name of the base link frame used as reference frame
+                for computing transforms and errors.
+            position_cost: Cost weight(s) for position error. Can be a single float
+                for uniform weighting or a sequence of 3 floats for per-axis weighting.
+            orientation_cost: Cost weight(s) for orientation error. Can be a single float
+                for uniform weighting or a sequence of 3 floats for per-axis weighting.
+            lm_damping: Levenberg-Marquardt damping factor for numerical stability.
+                Defaults to 0.0 (no damping).
+            gain: Task gain factor that scales the overall task contribution.
+                Defaults to 1.0.
         """
         super().__init__(frame, position_cost, orientation_cost, lm_damping, gain)
         self.base_link_frame_name = base_link_frame_name

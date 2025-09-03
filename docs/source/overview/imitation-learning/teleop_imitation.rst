@@ -508,10 +508,10 @@ Visualize the results of the trained policy by running the following command, us
    The trained policy performing the pick and place task in Isaac Lab.
 
 
-Demo 1.1: Data Generation and Policy Training for G1 Locomanipulation
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo 1.1: Data Generation and Policy Training for Humanoid Robot Locomanipulation with Unitree G1
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. figure:: https://download.isaacsim.omniverse.nvidia.com/isaaclab/images/locomanipulation-g-1_steering_wheel_pick_place
+.. figure:: https://download.isaacsim.omniverse.nvidia.com/isaaclab/images/locomanipulation-g-1_steering_wheel_pick_place.gif
    :width: 100%
    :align: center
    :alt: G1 humanoid robot with locomanipulation performing a pick and place task
