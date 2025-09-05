@@ -15,8 +15,8 @@ To run the disjoint navigation replay script execute the following command.
     --kit_args="--enable isaacsim.replicator.mobility_gen" \
     --dataset="datasets/dataset_generated_g1_locomotion_teacher.hdf5" \
     --num_runs=1 \
-    --lift_step=50 \
-    --navigate_step=100 \
+    --lift_step=70 \
+    --navigate_step=120 \
     --output_dir=datasets \
     --output_file_name=dataset_generated_disjoint_nav.hdf5
 ```

@@ -141,7 +141,7 @@ def replay(
     distance_threshold=0.1,
     following_offset=0.6,
     angle_threshold=0.2,
-    approach_distance: float = 0.5,
+    approach_distance: float = 1.0,
     randomize_placement: bool = True,
 ):
 
