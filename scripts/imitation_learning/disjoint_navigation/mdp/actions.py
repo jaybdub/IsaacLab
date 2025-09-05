@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING
 from pink.tasks import FrameTask
 
 from isaaclab.assets.articulation import Articulation
-from isaaclab.controllers.pink_ik_cfg import PinkIKControllerCfg
+from isaaclab.controllers.pink_ik.pink_ik_cfg import PinkIKControllerCfg
 from isaaclab.controllers.utils import load_torchscript_model
 from isaaclab.envs.mdp.actions.pink_actions_cfg import PinkInverseKinematicsActionCfg
 from isaaclab.managers.action_manager import ActionTerm, ActionTermCfg

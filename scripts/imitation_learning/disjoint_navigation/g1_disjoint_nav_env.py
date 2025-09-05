@@ -21,7 +21,7 @@ from common import (
     SceneBody,
     SceneFixture,
 )
-from mdp.actions import G1_UPPER_BODY_IK_ACTION_CFG, LowerBodyActionCfg
+# from mdp.actions import G1_UPPER_BODY_IK_ACTION_CFG, LowerBodyActionCfg
 from occupancy_map import OccupancyMap
 
 import isaaclab.envs.mdp as base_mdp
@@ -38,181 +38,23 @@ from isaaclab.managers.recorder_manager import RecorderTerm, RecorderTermCfg
 from isaaclab.scene import InteractiveSceneCfg
 from isaaclab.sim.spawners.from_files.from_files_cfg import GroundPlaneCfg, UsdFileCfg
 from isaaclab.utils import configclass
-from isaaclab.utils.assets import ISAAC_NUCLEUS_DIR, retrieve_file_path
+from isaaclab.utils.assets import ISAAC_NUCLEUS_DIR, ISAACLAB_NUCLEUS_DIR, retrieve_file_path
 from isaaclab.utils.datasets import HDF5DatasetFileHandler
 
-from isaaclab_tasks.manager_based.locomanipulation.pick_place.locomanipulation_g1_env_cfg import ObservationsCfg
+from isaaclab_tasks.manager_based.locomanipulation.pick_place.locomanipulation_g1_env_cfg import (
+    LocomanipulationG1SceneCfg,
+    LocomanipulationG1EnvCfg
+)
 
 NUM_FORKLIFTS = 6
 NUM_BOXES = 12
-
-G1_LOCOMANIPULATION_ROBOT_CFG = ArticulationCfg(
-    spawn=sim_utils.UsdFileCfg(
-        usd_path="omniverse://isaac-dev.ov.nvidia.com/Projects/agile/Robots/Collected_g1/g1_collision_geom_simplified_bigger_offset_with_hand_collision.usd",
-        activate_contact_sensors=False,
-        rigid_props=sim_utils.RigidBodyPropertiesCfg(
-            disable_gravity=False,
-            retain_accelerations=False,
-            linear_damping=0.0,
-            angular_damping=0.0,
-            max_linear_velocity=1000.0,
-            max_angular_velocity=1000.0,
-            max_depenetration_velocity=1.0,
-        ),
-        articulation_props=sim_utils.ArticulationRootPropertiesCfg(
-            enabled_self_collisions=False,
-            fix_root_link=False,  # Configurable - can be set to True for fixed base
-            solver_position_iteration_count=8,
-            solver_velocity_iteration_count=4,
-        ),
-    ),
-    init_state=ArticulationCfg.InitialStateCfg(
-        pos=(0.0, 0.0, 0.75),
-        rot=(0.7071, 0, 0, 0.7071),
-        joint_pos={
-            ".*_hip_pitch_joint": -0.10,
-            ".*_knee_joint": 0.30,
-            ".*_ankle_pitch_joint": -0.20,
-        },
-        joint_vel={".*": 0.0},
-    ),
-    soft_joint_pos_limit_factor=0.9,
-    actuators={
-        "legs": DCMotorCfg(
-            joint_names_expr=[
-                ".*_hip_yaw_joint",
-                ".*_hip_roll_joint",
-                ".*_hip_pitch_joint",
-                ".*_knee_joint",
-            ],
-            effort_limit={
-                ".*_hip_yaw_joint": 88.0,
-                ".*_hip_roll_joint": 88.0,
-                ".*_hip_pitch_joint": 88.0,
-                ".*_knee_joint": 139.0,
-            },
-            velocity_limit={
-                ".*_hip_yaw_joint": 32.0,
-                ".*_hip_roll_joint": 32.0,
-                ".*_hip_pitch_joint": 32.0,
-                ".*_knee_joint": 20.0,
-            },
-            stiffness={
-                ".*_hip_yaw_joint": 100.0,
-                ".*_hip_roll_joint": 100.0,
-                ".*_hip_pitch_joint": 100.0,
-                ".*_knee_joint": 200.0,
-            },
-            damping={
-                ".*_hip_yaw_joint": 2.5,
-                ".*_hip_roll_joint": 2.5,
-                ".*_hip_pitch_joint": 2.5,
-                ".*_knee_joint": 5.0,
-            },
-            armature={
-                ".*_hip_.*": 0.03,
-                ".*_knee_joint": 0.03,
-            },
-            saturation_effort=180.0,
-        ),
-        "feet": DCMotorCfg(
-            joint_names_expr=[".*_ankle_pitch_joint", ".*_ankle_roll_joint"],
-            stiffness={
-                ".*_ankle_pitch_joint": 20.0,
-                ".*_ankle_roll_joint": 20.0,
-            },
-            damping={
-                ".*_ankle_pitch_joint": 0.2,
-                ".*_ankle_roll_joint": 0.1,
-            },
-            effort_limit={
-                ".*_ankle_pitch_joint": 50.0,
-                ".*_ankle_roll_joint": 50.0,
-            },
-            velocity_limit={
-                ".*_ankle_pitch_joint": 37.0,
-                ".*_ankle_roll_joint": 37.0,
-            },
-            armature=0.03,
-            saturation_effort=80.0,
-        ),
-        "waist": ImplicitActuatorCfg(
-            joint_names_expr=[
-                "waist_.*_joint",
-            ],
-            effort_limit={
-                "waist_yaw_joint": 88.0,
-                "waist_roll_joint": 50.0,
-                "waist_pitch_joint": 50.0,
-            },
-            velocity_limit={
-                "waist_yaw_joint": 32.0,
-                "waist_roll_joint": 37.0,
-                "waist_pitch_joint": 37.0,
-            },
-            stiffness={
-                "waist_yaw_joint": 3000.0,
-                "waist_roll_joint": 3000.0,
-                "waist_pitch_joint": 3000.0,
-            },
-            damping={
-                "waist_yaw_joint": 5.0,
-                "waist_roll_joint": 5.0,
-                "waist_pitch_joint": 5.0,
-            },
-            armature=0.01,
-        ),
-        "arms": ImplicitActuatorCfg(
-            joint_names_expr=[
-                ".*_shoulder_pitch_joint",
-                ".*_shoulder_roll_joint",
-                ".*_shoulder_yaw_joint",
-                ".*_elbow_joint",
-                ".*_wrist_.*_joint",
-            ],
-            effort_limit=300,
-            velocity_limit=100,
-            stiffness=3000.0,
-            damping=10.0,
-            armature={
-                ".*_shoulder_.*": 0.01,
-                ".*_elbow_.*": 0.01,
-                ".*_wrist_.*_joint": 0.01,
-            },
-        ),
-        "hands": ImplicitActuatorCfg(
-            joint_names_expr=[
-                ".*_index_.*",
-                ".*_middle_.*",
-                ".*_thumb_.*",
-            ],
-            effort_limit=300,
-            velocity_limit=100,
-            stiffness=4000,
-            damping=50,
-            armature=0.001,
-        ),
-    },
-    prim_path="/World/envs/env_.*/Robot",
-)
-
 
 ##
 # Scene definition
 ##
 @configclass
-class ObjectTableSceneCfg(InteractiveSceneCfg):
-
-    # Table
-    packing_table = AssetBaseCfg(
-        prim_path="/World/envs/env_.*/PackingTable",
-        init_state=AssetBaseCfg.InitialStateCfg(pos=[0.0, 0.55, -0.3], rot=[1.0, 0.0, 0.0, 0.0]),
-        spawn=UsdFileCfg(
-            usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/PackingTable/packing_table.usd",
-            rigid_props=sim_utils.RigidBodyPropertiesCfg(kinematic_enabled=True),
-        ),
-    )
-
+class DisjointNavG1SceneCfg(LocomanipulationG1SceneCfg):
+    
     packing_table_2 = AssetBaseCfg(
         prim_path="/World/envs/env_.*/PackingTable2",
         init_state=AssetBaseCfg.InitialStateCfg(
@@ -226,36 +68,11 @@ class ObjectTableSceneCfg(InteractiveSceneCfg):
         ),
     )
 
-    # Object
-    object = RigidObjectCfg(
-        prim_path="{ENV_REGEX_NS}/Object",
-        init_state=RigidObjectCfg.InitialStateCfg(pos=[-0.35, 0.45, 0.9996 - 0.3], rot=[1, 0, 0, 0]),
-        spawn=UsdFileCfg(
-            usd_path="omniverse://isaac-dev.ov.nvidia.com/Isaac/IsaacLab/Mimic/pick_place_task/pick_place_assets/steering_wheel.usd",
-            scale=(0.75, 0.75, 0.75),
-            rigid_props=sim_utils.RigidBodyPropertiesCfg(),
-        ),
-    )
-    # Humanoid robot w/ arms higher
-    robot: ArticulationCfg = G1_LOCOMANIPULATION_ROBOT_CFG.replace(prim_path="/World/envs/env_.*/Robot")
-
-    # Ground plane
-    ground = AssetBaseCfg(
-        prim_path="/World/GroundPlane",
-        spawn=GroundPlaneCfg(),
-    )
-
-    # Lights
-    light = AssetBaseCfg(
-        prim_path="/World/light",
-        spawn=sim_utils.DomeLightCfg(color=(0.75, 0.75, 0.75), intensity=3000.0),
-    )
-
 
 # Add forklifts
 for i in range(NUM_FORKLIFTS):
     setattr(
-        ObjectTableSceneCfg,
+        DisjointNavG1SceneCfg,
         f"forklift_{i}",
         AssetBaseCfg(
             prim_path=f"/World/envs/env_.*/Forklift{i}",
@@ -270,7 +87,7 @@ for i in range(NUM_FORKLIFTS):
 # Add boxes
 for i in range(NUM_BOXES):
     setattr(
-        ObjectTableSceneCfg,
+        DisjointNavG1SceneCfg,
         f"box_{i}",
         AssetBaseCfg(
             prim_path=f"/World/envs/env_.*/Box{i}",
@@ -283,45 +100,16 @@ for i in range(NUM_BOXES):
     )
 
 
-##
-# MDP settings
-##
-@configclass
-class ActionsCfg:
-    """Action specifications for the MDP."""
-
-    upper_body_ik = G1_UPPER_BODY_IK_ACTION_CFG
-
-    # This term can be removed on the ik supports the waist joints.
-    waist_joint_pos = base_mdp.JointPositionActionCfg(
-        asset_name="robot",
-        joint_names=["waist_.*_joint"],
-        use_default_offset=True,
-        clip={".*": (-0.0, 0.0)},
-    )
-
-    lower_body_joint_pos = LowerBodyActionCfg(
-        asset_name="robot",
-        joint_names=[
-            ".*_hip_.*_joint",
-            ".*_knee_joint",
-            ".*_ankle_.*_joint",
-        ],
-        scale=0.25,
-        obs_group_name="lower_body_policy",  # need to be the same name as the on in ObservationCfg
-        policy_path=Path(__file__).parent / "policy/g1/agile_locomotion.pt",
-    )
-
 
 @configclass
-class TerminationsCfg:
+class DisjointNavG1TerminationsCfg:
     """Termination terms for the MDP."""
 
     time_out = DoneTerm(func=base_mdp.time_out, time_out=True)
 
 
 @configclass
-class EventCfg:
+class DisjointNavG1EventCfg:
     """Configuration for events."""
 
     reset_all = EventTerm(func=base_mdp.reset_scene_to_default, mode="reset")
@@ -374,52 +162,35 @@ class DisjointNavReplayStateRecorderCfg(RecorderTermCfg):
     class_type: type[RecorderTerm] = DisjointNavReplayStateRecorder
 
 
-class RecorderManagerCfg(ActionStateRecorderManagerCfg):
+class DisjointNavRecorderManagerCfg(ActionStateRecorderManagerCfg):
     record_pre_step_lower_body_policy_observations = PreStepLowerBodyPolicyObservationsRecorderCfg()
     record_pre_step_disjoint_nav_replay_state = DisjointNavReplayStateRecorderCfg()
 
 
 @configclass
-class G129DoFDisjointNavEnvCfg(ManagerBasedRLEnvCfg):
+class DisjointNavG1EnvCfg(LocomanipulationG1EnvCfg):
     """Configuration for the G1 29DoF environment."""
 
     # Scene settings
-    scene: ObjectTableSceneCfg = ObjectTableSceneCfg(num_envs=1, env_spacing=2.5, replicate_physics=True)
-    # Basic settings
-    observations: ObservationsCfg = ObservationsCfg()
-    actions: ActionsCfg = ActionsCfg()
+    scene: DisjointNavG1SceneCfg = DisjointNavG1SceneCfg(num_envs=1, env_spacing=2.5, replicate_physics=True)
     # MDP settings
-    terminations: TerminationsCfg = TerminationsCfg()
-    events: EventCfg = EventCfg()
-
-    # Unused managers
-    commands = None
-    rewards = None
-    curriculum = None
-
-    # Position of the XR anchor in the world frame
-    xr: XrCfg = XrCfg(
-        anchor_pos=(0.0, 0.0, 0.0),
-        anchor_rot=(1.0, 0.0, 0.0, 0.0),
-    )
+    terminations: DisjointNavG1TerminationsCfg = DisjointNavG1TerminationsCfg()
+    events: DisjointNavG1EventCfg = DisjointNavG1EventCfg()
 
     def __post_init__(self):
         """Post initialization."""
         # general settings
         self.decimation = 4
-        self.episode_length_s = 60.0
+        self.episode_length_s = 100.0
         # simulation settings
-        self.sim.dt = 1 / 200  # 100Hz
-        self.sim.render_interval = 2
+        self.sim.dt = 1 / 200  # 200Hz
+        self.sim.render_interval = 6
 
         # Set the URDF and mesh paths for the IK controller
-        urdf_omniverse_path = "omniverse://isaac-dev.ov.nvidia.com/Projects/agile/Robots/urdf/g1/g1_minimal_with_leg_hand_collision_corrected.urdf"
-        mesh_omniverse_path = "omniverse://isaac-dev.ov.nvidia.com/Projects/agile/Robots/urdf/g1/meshes"
+        urdf_omniverse_path = f"{ISAACLAB_NUCLEUS_DIR}/Controllers/LocomanipulationAssets/unitree_g1_kinematics_asset/g1_29dof_with_hand_only_kinematics.urdf"
 
         # Retrieve local paths for the URDF and mesh files. Will be cached for call after the first time.
         self.actions.upper_body_ik.controller.urdf_path = retrieve_file_path(urdf_omniverse_path)
-        self.actions.upper_body_ik.controller.mesh_path = retrieve_file_path(mesh_omniverse_path)
-
 
 class PackingTable(SceneFixture):
 
@@ -510,13 +281,13 @@ class G1DisjointNavRecording(DisjointNavRecording):
 class G1DisjointNavScenario(DisjointNavScenario):
 
     def __init__(self, output_dir: str, output_file_name: str):
-        self._env_cfg = G129DoFDisjointNavEnvCfg()
+        self._env_cfg = DisjointNavG1EnvCfg()
         self._env_cfg.sim.device = "cpu"
         # self._env_cfg.sim.render.rendering_mode = "performance"
 
         self._env_cfg.scene.num_envs = 1
 
-        self._env_cfg.recorders = RecorderManagerCfg()
+        self._env_cfg.recorders = DisjointNavRecorderManagerCfg()
         self._env_cfg.recorders.dataset_export_dir_path = output_dir
         self._env_cfg.recorders.dataset_filename = output_file_name
 
@@ -524,12 +295,12 @@ class G1DisjointNavScenario(DisjointNavScenario):
 
         self._env.sim.set_camera_view([10.5, 10.5, 10.5], [0.0, 0.0, 0.5])
         self._upper_body_dim = self._env.action_manager.get_term("upper_body_ik").action_dim
-        self._waist_dim = self._env.action_manager.get_term("waist_joint_pos").action_dim
+        self._waist_dim = 0#self._env.action_manager.get_term("waist_joint_pos").action_dim
         self._lower_body_dim = self._env.action_manager.get_term("lower_body_joint_pos").action_dim
         self._frame_pose_dim = 7
         self._number_of_finger_joints = 7
         self._env_action = torch.zeros(self._env.action_space.shape)
-        self.set_base_height_target()
+        self.set_base_height_target( torch.tensor([0.8]))
 
     def set_left_hand_pose_target(self, pose: torch.Tensor):
         assert pose.shape == (self._frame_pose_dim,), f"Expected pose shape ({self._frame_pose_dim},), got {pose.shape}"
