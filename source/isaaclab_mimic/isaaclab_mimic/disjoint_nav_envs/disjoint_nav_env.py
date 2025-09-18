@@ -19,25 +19,29 @@ from isaaclab_mimic.navigation_path_planner.disjoint_nav.disjoint_nav_scene_util
 class DisjointNavOutputDataRecorder(RecorderTerm):
 
     def record_pre_step(self):
-        output_data: DisjointNavOutputData = self._env._disjoint_nav_output_data
 
-        output_data_dict = {
-            "left_hand_pose_target": output_data.left_hand_pose_target[None, :],
-            "right_hand_pose_target": output_data.right_hand_pose_target[None, :],
-            "left_hand_joint_positions_target": output_data.left_hand_joint_positions_target[None, :],
-            "right_hand_joint_positions_target": output_data.right_hand_joint_positions_target[None, :],
-            "base_velocity_target": output_data.base_velocity_target[None, :],
-            "start_fixture_pose": output_data.start_fixture_pose,
-            "end_fixture_pose": output_data.end_fixture_pose,
-            "object_pose": output_data.object_pose,
-            "base_pose": output_data.base_pose,
-            "task": torch.tensor([[output_data.data_generation_state]]),
-            "base_goal_pose": output_data.base_goal_pose,
-            "base_goal_approach_pose": output_data.base_goal_approach_pose,
-            "base_path": output_data.base_path[None, :],
-            "recording_step": torch.tensor([[output_data.recording_step]]),
-            "obstacle_fixture_poses": output_data.obstacle_fixture_poses,
-        }
+        if hasattr(self._env, "disjoint_nav_output_data") and self._env.disjoint_nav_output_data is not None:
+            output_data: DisjointNavOutputData = self._env._disjoint_nav_output_data
+
+            output_data_dict = {
+                "left_hand_pose_target": output_data.left_hand_pose_target[None, :],
+                "right_hand_pose_target": output_data.right_hand_pose_target[None, :],
+                "left_hand_joint_positions_target": output_data.left_hand_joint_positions_target[None, :],
+                "right_hand_joint_positions_target": output_data.right_hand_joint_positions_target[None, :],
+                "base_velocity_target": output_data.base_velocity_target[None, :],
+                "start_fixture_pose": output_data.start_fixture_pose,
+                "end_fixture_pose": output_data.end_fixture_pose,
+                "object_pose": output_data.object_pose,
+                "base_pose": output_data.base_pose,
+                "task": torch.tensor([[output_data.data_generation_state]]),
+                "base_goal_pose": output_data.base_goal_pose,
+                "base_goal_approach_pose": output_data.base_goal_approach_pose,
+                "base_path": output_data.base_path[None, :],
+                "recording_step": torch.tensor([[output_data.recording_step]]),
+                "obstacle_fixture_poses": output_data.obstacle_fixture_poses,
+            }
+        else:
+            output_data_dict = {}
 
         return "disjoint_nav_output_data", output_data_dict
 
