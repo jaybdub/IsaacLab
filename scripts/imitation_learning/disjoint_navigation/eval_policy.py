@@ -158,9 +158,8 @@ def eval_policy(
     step = 0
 
     action_idx = 0
-    action_buffer: torch.Tensor | None = None
-    inference_interval = 1
-    offset = 14
+    action_buffer_avg = None
+    inference_interval = 16
 
     while simulation_app.is_running() and not simulation_app.is_exiting():
 
@@ -172,18 +171,21 @@ def eval_policy(
             action_buffer = torch.cat([torch.from_numpy(v) for v in action_dict.values()], dim=-1)
             action_idx = 0
         
-        base_pose = env.get_base().get_pose()
-        # Transform local action to world frame
-        action_buffer[:, 0:7] = transform_mul(base_pose, action_buffer[:, 0:7])
-        action_buffer[:, 7:14] = transform_mul(base_pose, action_buffer[:, 7:14])
-
-        if step < 160:
+        # moving avg
+        if step < 10:
             env.step(dummy_action)
         else:
-            env.step(action_buffer[action_idx:action_idx+1])
+            # if action_buffer_avg is None:
+            #     action_buffer_avg = action_buffer
+            # else:
+            #     action_buffer_avg = 0.5 * action_buffer_avg + 0.5 * action_buffer_avg
+            base_pose = env.get_base().get_pose()
+            action = action_buffer.clone()
+            action[:, 0:7] = transform_mul(base_pose, action[:, 0:7]) # convert poses to world coordinates
+            action[:, 7:14] = transform_mul(base_pose, action[:, 7:14])
+            action[:, 28:31] = action[:, 28:31] * 0.85
+            env.step(action[action_idx:action_idx+1])
 
-        print(f"{step}/{action_idx}")
-        
         step += 1
         action_idx += 1
 
