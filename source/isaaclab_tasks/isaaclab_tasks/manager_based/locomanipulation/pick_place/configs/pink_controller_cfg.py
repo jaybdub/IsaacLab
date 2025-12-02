@@ -85,7 +85,7 @@ G1_UPPER_BODY_IK_ACTION_CFG = PinkInverseKinematicsActionCfg(
         ".*_wrist_pitch_joint",
         ".*_wrist_roll_joint",
         ".*_wrist_yaw_joint",
-        "waist_.*_joint",
+        # "waist_.*_joint",
     ],
     hand_joint_names=[
         "left_hand_index_0_joint",  # Index finger proximal
