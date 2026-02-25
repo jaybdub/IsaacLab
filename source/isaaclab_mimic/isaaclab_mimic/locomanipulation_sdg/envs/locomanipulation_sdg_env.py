@@ -17,7 +17,30 @@ class LocomanipulationSDGOutputDataRecorder(RecorderTerm):
     """Recorder for Locomanipulation SDG output data."""
 
     def record_pre_step(self):
-        output_data: LocomanipulationSDGOutputData = self._env._locomanipulation_sdg_output_data
+        output_data: LocomanipulationSDGOutputData | None = getattr(
+            self._env, "_locomanipulation_sdg_output_data", None
+        )
+        if output_data is None:
+            # Policy rollout or other use: no SDG output to record; return dummy so recorder manager doesn't break.
+            device = getattr(self._env, "device", None) or torch.device("cpu")
+            output_data_dict = {
+                "left_hand_pose_target": torch.zeros(1, 7, device=device),
+                "right_hand_pose_target": torch.zeros(1, 7, device=device),
+                "left_hand_joint_positions_target": torch.zeros(1, 7, device=device),
+                "right_hand_joint_positions_target": torch.zeros(1, 7, device=device),
+                "base_velocity_target": torch.zeros(1, 3, device=device),
+                "start_fixture_pose": torch.zeros(7, device=device),
+                "end_fixture_pose": torch.zeros(7, device=device),
+                "object_pose": torch.zeros(7, device=device),
+                "base_pose": torch.zeros(7, device=device),
+                "task": torch.zeros(1, 1, dtype=torch.long, device=device),
+                "base_goal_pose": torch.zeros(7, device=device),
+                "base_goal_approach_pose": torch.zeros(7, device=device),
+                "base_path": torch.zeros(1, 3, device=device),
+                "recording_step": torch.zeros(1, 1, dtype=torch.long, device=device),
+                "obstacle_fixture_poses": torch.zeros(1, 7, device=device),
+            }
+            return "locomanipulation_sdg_output_data", output_data_dict
 
         output_data_dict = {
             "left_hand_pose_target": output_data.left_hand_pose_target[None, :],

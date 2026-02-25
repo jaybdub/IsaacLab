@@ -274,11 +274,16 @@ def setup_navigation_scene(
         ]
     )
 
+    randomize_placement=False
     # Randomize fixture placement if enabled
     if randomize_placement:
         fixtures = [env.get_end_fixture()] + env.get_obstacle_fixtures()
         for fixture in fixtures:
             place_randomly(fixture, occupancy_map.buffered_meters(1.0))
+            occupancy_map = merge_occupancy_maps([occupancy_map, fixture.get_occupancy_map()])
+    else:
+        fixtures = [env.get_end_fixture()] + env.get_obstacle_fixtures()
+        for fixture in fixtures:
             occupancy_map = merge_occupancy_maps([occupancy_map, fixture.get_occupancy_map()])
 
     # Compute goal poses from initial state

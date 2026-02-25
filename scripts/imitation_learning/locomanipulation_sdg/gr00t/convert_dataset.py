@@ -231,6 +231,7 @@ if __name__ == "__main__":
 
         dataset = h5py.File(dataset_path, "r")
 
+        print(dataset['data'].keys())
         # PROCESS EPISODE
         for demo_name in dataset['data'].keys():
 

@@ -30,8 +30,8 @@ from isaaclab_tasks.manager_based.locomanipulation.pick_place.locomanipulation_g
 from .locomanipulation_sdg_env import LocomanipulationSDGEnv
 from .locomanipulation_sdg_env_cfg import LocomanipulationSDGEnvCfg, LocomanipulationSDGRecorderManagerCfg
 
-NUM_FORKLIFTS = 6
-NUM_BOXES = 12
+NUM_FORKLIFTS = 0
+NUM_BOXES = 0
 
 
 @configclass
@@ -141,6 +141,8 @@ class G1LocomanipulationSDGEnvCfg(LocomanipulationG1EnvCfg, LocomanipulationSDGE
 class G1LocomanipulationSDGEnv(LocomanipulationSDGEnv):
     def __init__(self, cfg: G1LocomanipulationSDGEnvCfg, **kwargs):
         super().__init__(cfg)
+        # Set by generate_data.py during data generation; None during policy rollout.
+        self._locomanipulation_sdg_output_data = None
         self.sim.set_camera_view([10.5, 10.5, 10.5], [0.0, 0.0, 0.5])
         self._upper_body_dim = self.action_manager.get_term("upper_body_ik").action_dim
         self._waist_dim = 0  # self._env.action_manager.get_term("waist_joint_pos").action_dim

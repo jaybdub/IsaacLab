@@ -24,6 +24,7 @@ from isaaclab.managers import ObservationGroupCfg as ObsGroup
 from isaaclab.managers import ObservationTermCfg as ObsTerm
 from isaaclab.managers import SceneEntityCfg
 from isaaclab.managers import TerminationTermCfg as DoneTerm
+from isaaclab.managers import EventTermCfg as EventTerm
 from isaaclab.scene import InteractiveSceneCfg
 from isaaclab.sim.spawners.from_files.from_files_cfg import GroundPlaneCfg, UsdFileCfg
 from isaaclab.utils import configclass
@@ -170,6 +171,26 @@ class TerminationsCfg:
 ##
 
 
+@configclass
+class EventCfg:
+    """Configuration for events."""
+
+    reset_all = EventTerm(func=base_mdp.reset_scene_to_default, mode="reset")
+
+    reset_object = EventTerm(
+        func=base_mdp.reset_root_state_uniform,
+        mode="reset",
+        params={
+            "pose_range": {
+                "x": [-0.01, 0.01],
+                "y": [-0.01, 0.01],
+            },
+            "velocity_range": {},
+            "asset_cfg": SceneEntityCfg("object"),
+        },
+    )
+
+    
 @configclass
 class LocomanipulationG1EnvCfg(ManagerBasedRLEnvCfg):
     """Configuration for the G1 locomanipulation environment.

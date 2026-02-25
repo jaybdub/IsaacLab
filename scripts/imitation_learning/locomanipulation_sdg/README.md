@@ -13,6 +13,12 @@ cp scripts/imitation_learning/locomanipulation_sdg/gr00t_policy/data_config.py I
 Install GR00T N1.5
 
 ```bash
-uv pip install -e .[base]
-uv pip install --no-build-isolation flash-attn==2.7.1.post4 
+uv pip install -e .
+uv pip install wheel
+MAX_JOBS=4 uv pip install --no-build-isolation flash-attn==2.7.1.post4 
+MAX_JOBS=4 uv pip install --no-build-isolation pytorch3d
+uv pip install diffusers decord zmq
+# uv pip install numpy --upgrade
 ```
+
+./_isaac_sim/python.sh -m pip 
