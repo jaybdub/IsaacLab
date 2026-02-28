@@ -890,11 +890,34 @@ def replay(
     # Reset recorder manager to clear any leftover episode data from previous runs
     # This prevents duplicate exports when reset_to calls record_pre_reset
     env.recorder_manager.reset(env_ids=[0])
+    device = env.device
+
+    initial_state = input_episode_data.get_initial_state()
+    # Robot velocities → 0
+    initial_state["articulation"]["robot"]["root_velocity"] = torch.zeros_like(
+        initial_state["articulation"]["robot"]["root_velocity"], device=device
+    )
+    initial_state["articulation"]["robot"]["joint_velocity"] = torch.zeros_like(
+        initial_state["articulation"]["robot"]["joint_velocity"], device=device
+    )
+
+    # Object velocity → 0
+    initial_state["rigid_object"]["object"]["root_velocity"] = torch.zeros_like(
+        initial_state["rigid_object"]["object"]["root_velocity"], device=device
+    )
 
     # Initialize environment to starting state
+    env.reset()
+    env.reset()
+    env.reset()
+    env.reset()
     env.reset_to(
-        state=input_episode_data.get_initial_state(), env_ids=torch.tensor([0], device=env.device), is_relative=True
+        state=initial_state, env_ids=torch.tensor([0], device=env.device), is_relative=True
     )
+    # env.reset_to(
+    #     state=initial_state, env_ids=torch.tensor([0], device=env.device), is_relative=True
+    # )
+    # env.reset()
 
     # Create navigation control configuration
     config = LocomanipulationSDGControlConfig(
@@ -925,6 +948,7 @@ def replay(
 
     # Main simulation loop with state machine
     while simulation_app.is_running() and not simulation_app.is_exiting():
+
         if current_state != previous_state:
             print(f"State changed: {current_state.name}, Recording step: {recording_step}", flush=True)
             previous_state = current_state
@@ -984,6 +1008,7 @@ def replay(
 
         if reset_terminated[0] or reset_time_outs[0]:
             print(f"Environment terminated at state {current_state.name}, step {recording_step}", flush=True)
+            recording_step = 0
             success_terminated = False
 
             # Check if termination was due to success

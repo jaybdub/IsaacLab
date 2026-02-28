@@ -17,7 +17,11 @@ class LocomanipulationSDGOutputDataRecorder(RecorderTerm):
     """Recorder for Locomanipulation SDG output data."""
 
     def record_pre_step(self):
-        output_data: LocomanipulationSDGOutputData = self._env._locomanipulation_sdg_output_data
+        output_data: LocomanipulationSDGOutputData | None = getattr(
+            self._env, "_locomanipulation_sdg_output_data", None
+        )
+        if output_data is None:
+            return None, None
 
         output_data_dict = {
             "left_hand_pose_target": output_data.left_hand_pose_target[None, :],
